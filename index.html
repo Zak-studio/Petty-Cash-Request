@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project Expense Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 8px;
+    }
+    h2 { text-align: center; }
+    label { font-weight: bold; display: block; margin-top: 15px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Project Expense Entry Form</h2>
+
+  <form action="https://tally.so/r/mRlOJp" method="POST">
+    <label for="date">Date:</label>
+    <input type="date" name="Date" id="date" required />
+
+    <label for="name">Worker Name:</label>
+    <input type="text" name="Name" id="name" required />
+
+    <label for="project">Project Name:</label>
+    <input type="text" name="Project" id="project" required />
+
+    <label for="amount">Amount (INR):</label>
+    <input type="number" name="Amount" id="amount" required />
+
+    <label for="category">Category:</label>
+    <select name="Category" id="category" required>
+      <option value="">-- Select --</option>
+      <option value="Material">Material</option>
+      <option value="Manpower">Manpower</option>
+    </select>
+
+    <label for="reason">Reason for Amount:</label>
+    <textarea name="Reason" id="reason" rows="4" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+</body>
+</html>
