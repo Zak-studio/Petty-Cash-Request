@@ -289,7 +289,6 @@
     <div class="container">
         <h1>DAPPERDEN</h1>
         <input type="file" id="imageInput" accept="image/*" />
-        <input type="file" id="frameInput" accept="image/*" />
         <br>
         <button onclick="generatePoster()">Generate Poster</button>
         <button onclick="generateLogoMarks()">LOGO MARKS</button>
@@ -326,7 +325,6 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const imageInput = document.getElementById('imageInput');
-        const frameInput = document.getElementById('frameInput');
         const downloadSelect = document.getElementById('downloadSelect');
         const cropModal = document.getElementById('cropModal');
         const imageToCrop = document.getElementById('imageToCrop');
@@ -334,7 +332,6 @@
 
         let uploadedImage = null;
         let frameImage = null;
-        let customFrameImage = null;
         let companyNameImage = null;
         let companyLogoImage = null;
         let cropper = null;
@@ -376,21 +373,6 @@
                         scalable: true,
                         rotatable: true,
                     });
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        frameInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    customFrameImage = new Image();
-                    customFrameImage.src = event.target.result;
-                    customFrameImage.onload = () => {
-                        if (uploadedImage) generatePoster();
-                    };
                 };
                 reader.readAsDataURL(file);
             }
@@ -451,9 +433,8 @@
 
             ctx.drawImage(uploadedImage, photoAreaX, photoAreaY, photoAreaWidth, photoAreaHeight);
 
-            const activeFrame = customFrameImage || frameImage;
-            if (activeFrame && activeFrame.complete && activeFrame.naturalWidth !== 0) {
-                ctx.drawImage(activeFrame, 0, 0, canvas.width, canvas.height);
+            if (frameImage && frameImage.complete && frameImage.naturalWidth !== 0) {
+                ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
             }
 
             downloadSelect.style.display = 'block';
@@ -485,8 +466,8 @@
             if (companyLogoImage && companyLogoImage.complete && companyLogoImage.naturalWidth !== 0) {
                 const logoWidth = 300;
                 const logoHeight = (logoWidth * companyLogoImage.naturalHeight) / companyLogoImage.naturalWidth;
-                const logoX = canvas.width - logoWidth - 50;
-                const logoY = photoAreaY + (photoAreaHeight - logoHeight) / 2;
+                const logoX = photoAreaX;
+                const logoY = photoAreaY - logoHeight - 50; // 50px margin from top
                 ctx.drawImage(companyLogoImage, logoX, logoY, logoWidth, logoHeight);
             }
 
