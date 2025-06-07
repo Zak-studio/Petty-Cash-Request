@@ -33,7 +33,7 @@
             max-width: 600px;
             height: auto;
             display: block;
-            aspect-ratio: 9 / 16; /* Maintain 9:16 aspect ratio */
+            aspect-ratio: 9 / 16;
         }
         input, button, select {
             margin: 1.5vh 0;
@@ -72,8 +72,6 @@
         #downloadSelect {
             display: none;
         }
-
-        /* Modal for cropping */
         .modal {
             display: none;
             position: fixed;
@@ -109,7 +107,7 @@
             font-size: clamp(14px, 4vw, 16px);
         }
         .rotate-button {
-           "padding: 12px;
+            padding: 12px;
             margin: 5px;
         }
         .rotate-button:hover {
@@ -134,8 +132,6 @@
             font-size: 30px;
             cursor: pointer;
         }
-
-        /* Download status modal */
         .download-status {
             display: none;
             position: fixed;
@@ -173,7 +169,6 @@
             font-size: 18px;
             margin-bottom: 10px;
         }
-
         @media (max-width: 768px) {
             .container {
                 padding: 4vw;
@@ -212,7 +207,6 @@
                 font-size: 16px;
             }
         }
-
         @media (max-width: 480px) {
             .container {
                 padding: 5vw;
@@ -259,7 +253,6 @@
                 font-size: 14px;
             }
         }
-
         @media (max-width: 375px) {
             .container {
                 padding: 6vw;
@@ -296,8 +289,10 @@
     <div class="container">
         <h1>DAPPERDEN</h1>
         <input type="file" id="imageInput" accept="image/*" />
+        <input type="file" id="frameInput" accept="image/*" />
         <br>
         <button onclick="generatePoster()">Generate Poster</button>
+        <button onclick="generateLogoMarks()">LOGO MARKS</button>
         <br>
         <canvas id="canvas"></canvas>
         <br>
@@ -307,8 +302,6 @@
             <option value="instagram">Instagram Post (1080x1350)</option>
         </select>
     </div>
-
-    <!-- Modal for cropping -->
     <div id="cropModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeCropModal()">×</span>
@@ -322,20 +315,18 @@
             </div>
         </div>
     </div>
-
-    <!-- Download status modal -->
     <div id="downloadStatus" class="download-status">
         <div class="download-status-content">
             <div class="spinner"></div>
             <div class="download-text">Mr. Hafil your poster is downloading...</div>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const imageInput = document.getElementById('imageInput');
+        const frameInput = document.getElementById('frameInput');
         const downloadSelect = document.getElementById('downloadSelect');
         const cropModal = document.getElementById('cropModal');
         const imageToCrop = document.getElementById('imageToCrop');
@@ -343,14 +334,21 @@
 
         let uploadedImage = null;
         let frameImage = null;
+        let customFrameImage = null;
+        let companyNameImage = null;
+        let companyLogoImage = null;
         let cropper = null;
 
-        // Load the default static frame from the GitHub repository
         frameImage = new Image();
         frameImage.src = './frame.png';
 
+        companyNameImage = new Image();
+        companyNameImage.src = './TXT.png';
+
+        companyLogoImage = new Image();
+        companyLogoImage.src = './D2.png';
+
         function resizeCanvas() {
-            // Set the actual canvas resolution to 2160x3840px (9:16)
             canvas.width = 2160;
             canvas.height = 3840;
         }
@@ -358,8 +356,6 @@
         resizeCanvas();
 
         window.addEventListener('resize', () => {
-            // No need to resize the canvas resolution on window resize
-            // The CSS will handle the display scaling
             if (uploadedImage) generatePoster();
         });
 
@@ -372,14 +368,29 @@
                     cropModal.style.display = 'flex';
                     if (cropper) cropper.destroy();
                     cropper = new Cropper(imageToCrop, {
-                        aspectRatio: 1, // Match the 1:1 aspect ratio of the area
+                        aspectRatio: 1,
                         viewMode: 1,
-                        autoCropArea: 1.0, // Crop the entire area
+                        autoCropArea: 1.0,
                         movable: true,
                         zoomable: true,
                         scalable: true,
-                        rotatable: true, // Enable rotation
+                        rotatable: true,
                     });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        frameInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    customFrameImage = new Image();
+                    customFrameImage.src = event.target.result;
+                    customFrameImage.onload = () => {
+                        if (uploadedImage) generatePoster();
+                    };
                 };
                 reader.readAsDataURL(file);
             }
@@ -387,33 +398,33 @@
 
         function rotateLeft() {
             if (cropper) {
-                cropper.rotate(-90); // Rotate left by 90 degrees
+                cropper.rotate(-90);
             }
         }
 
         function rotateRight() {
             if (cropper) {
-                cropper.rotate(90); // Rotate right by 90 degrees
+                cropper.rotate(90);
             }
         }
 
         function closeCropModal() {
             cropModal.style.display = 'none';
             if (cropper) {
-                cropImage(); // Automatically crop when closing the modal
+                cropImage();
             }
         }
 
         function cropImage() {
             if (cropper) {
                 const croppedCanvas = cropper.getCroppedCanvas({
-                    width: 1728, // Force the output to be exactly 1728x1728
+                    width: 1728,
                     height: 1728,
                     minWidth: 1728,
                     minHeight: 1728,
                     maxWidth: 1728,
                     maxHeight: 1728,
-                    fillColor: '#fff' // Fill any empty areas with white
+                    fillColor: '#fff'
                 });
                 uploadedImage = new Image();
                 uploadedImage.src = croppedCanvas.toDataURL('image/png');
@@ -421,7 +432,6 @@
                     cropModal.style.display = 'none';
                     cropper.destroy();
                     cropper = null;
-                    generatePoster();
                 };
             }
         }
@@ -434,21 +444,52 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Define the photo area (1728x1728px)
             const photoAreaWidth = 1728;
             const photoAreaHeight = 1728;
-            const photoAreaX = (canvas.width - photoAreaWidth) / 2; // Center horizontally: 216px
-            const photoAreaY = 1000; // Position 1000px from the top
+            const photoAreaX = (canvas.width - photoAreaWidth) / 2;
+            const photoAreaY = 1000;
 
-            // Draw the uploaded photo - it will be exactly 1728x1728 since we cropped it that way
             ctx.drawImage(uploadedImage, photoAreaX, photoAreaY, photoAreaWidth, photoAreaHeight);
 
-            // Draw the default static frame over the photo
-            if (frameImage.complete && frameImage.naturalWidth !== 0) {
-                ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+            const activeFrame = customFrameImage || frameImage;
+            if (activeFrame && activeFrame.complete && activeFrame.naturalWidth !== 0) {
+                ctx.drawImage(activeFrame, 0, 0, canvas.width, canvas.height);
             }
 
-            // Show the download dropdown
+            downloadSelect.style.display = 'block';
+        }
+
+        function generateLogoMarks() {
+            if (!uploadedImage) {
+                alert('Please upload an image first!');
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const photoAreaWidth = 1728;
+            const photoAreaHeight = 1728;
+            const photoAreaX = (canvas.width - photoAreaWidth) / 2;
+            const photoAreaY = 1000;
+
+            ctx.drawImage(uploadedImage, photoAreaX, photoAreaY, photoAreaWidth, photoAreaHeight);
+
+            if (companyNameImage && companyNameImage.complete && companyNameImage.naturalWidth !== 0) {
+                const nameWidth = 600;
+                const nameHeight = (nameWidth * companyNameImage.naturalHeight) / companyNameImage.naturalWidth;
+                const nameX = (canvas.width - nameWidth) / 2;
+                const nameY = photoAreaY + (photoAreaHeight - nameHeight) / 2;
+                ctx.drawImage(companyNameImage, nameX, nameY, nameWidth, nameHeight);
+            }
+
+            if (companyLogoImage && companyLogoImage.complete && companyLogoImage.naturalWidth !== 0) {
+                const logoWidth = 300;
+                const logoHeight = (logoWidth * companyLogoImage.naturalHeight) / companyLogoImage.naturalWidth;
+                const logoX = canvas.width - logoWidth - 50;
+                const logoY = photoAreaY + (photoAreaHeight - logoHeight) / 2;
+                ctx.drawImage(companyLogoImage, logoX, logoY, logoWidth, logoHeight);
+            }
+
             downloadSelect.style.display = 'block';
         }
 
@@ -463,7 +504,7 @@
                 document.body.removeChild(link);
                 setTimeout(() => {
                     downloadStatus.style.display = 'none';
-                    downloadSelect.value = ''; // Reset dropdown to default
+                    downloadSelect.value = '';
                 }, 1000);
             }, 100);
         }
@@ -474,37 +515,27 @@
                 const downloadUrl = canvas.toDataURL('image/png');
                 downloadImage(downloadUrl, 'poster_original.png');
             } else if (option === 'instagram') {
-                // Create a new canvas for Instagram size (1080x1350, 4:5)
                 const instagramCanvas = document.createElement('canvas');
                 instagramCanvas.width = 1080;
                 instagramCanvas.height = 1350;
                 const instagramCtx = instagramCanvas.getContext('2d');
-
-                // Calculate scaling to fit 2160x3840 into 1080x1350 without cropping
-                const sourceAspect = canvas.width / canvas.height; // 2160/3840 = 0.5625
-                const targetAspect = 1080 / 1350; // 0.8 (4:5)
+                const sourceAspect = canvas.width / canvas.height;
+                const targetAspect = 1080 / 1350;
                 let drawWidth, drawHeight, offsetX, offsetY;
-
-                // Since source aspect (0.5625) < target aspect (0.8), fit by height
                 drawHeight = 1350;
-                drawWidth = drawHeight * sourceAspect; // 1350 * (2160/3840) ≈ 759.375
-                offsetX = (1080 - drawWidth) / 2; // Center horizontally: (1080 - 759.375) / 2 ≈ 160.3125
+                drawWidth = drawHeight * sourceAspect;
+                offsetX = (1080 - drawWidth) / 2;
                 offsetY = 0;
-
-                // Draw the entire original canvas, scaled to fit
                 instagramCtx.drawImage(
                     canvas,
                     0, 0, canvas.width, canvas.height,
                     offsetX, offsetY, drawWidth, drawHeight
                 );
-
-                // Fill any empty areas with white
                 instagramCtx.fillStyle = '#fff';
                 if (offsetX > 0) {
-                    instagramCtx.fillRect(0, 0, offsetX, 1350); // Left strip
-                    instagramCtx.fillRect(1080 - offsetX, 0, offsetX, 1350); // Right strip
+                    instagramCtx.fillRect(0, 0, offsetX, 1350);
+                    instagramCtx.fillRect(1080 - offsetX, 0, offsetX, 1350);
                 }
-
                 const downloadUrl = instagramCanvas.toDataURL('image/png');
                 downloadImage(downloadUrl, 'poster_instagram.png');
             }
